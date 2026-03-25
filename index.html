@@ -3,121 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SMISKI | Master Archive</title>
+    <title>SMISKI | Master Log</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { 
             --bg-primary: #ffffff;
-            --bg-sidebar: #fafafa;
             --header-yellow: #F6E957;
             --accent-green: #95ca72;
             --breadcrumb: #89b86b;
             --text-main: #333333;
-            --text-muted: #7a6e1d;
-            --card-bg: #ffffff;
-            --border-color: #eeeeee;
         }
 
         .theme-glow { 
             --bg-primary: #05070a;
-            --bg-sidebar: #0a0c14;
             --header-yellow: #0a0c14;
             --accent-green: #95ca72;
             --breadcrumb: #1a1e36;
             --text-main: #95ca72;
-            --text-muted: #95ca72;
-            --card-bg: #0d111a;
-            --border-color: #1a1e36;
-            --glow-effect: 0 0 18px rgba(149, 202, 114, 0.9);
+            --glow-effect: 0 0 15px rgba(149, 202, 114, 0.8);
         }
 
-        body { background-color: var(--bg-primary); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; transition: all 0.3s ease; overflow-x: hidden; }
+        body { background-color: var(--bg-primary); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; transition: all 0.3s ease; }
 
-        /* Sidebar & Mobile Layout Logic */
-        .sidebar { background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); width: 280px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
-        .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-yellow); border-top: 2px solid var(--accent-green); z-index: 1000; height: 70px; }
+        /* Desktop Sidebar Setup */
+        .desktop-sidebar { display: none; width: 280px; position: fixed; height: 100vh; left: 0; top: 0; background: #fafafa; border-right: 1px solid #eee; }
+        
+        /* Mobile Bottom Nav Setup */
+        .mobile-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: var(--header-yellow); border-top: 3px solid var(--accent-green); z-index: 9999; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
+
+        /* Main Content Padding Adjustments */
+        .main-content { margin-left: 0; padding-bottom: 100px; width: 100%; }
+
+        /* Responsive Breakpoints */
+        @media (min-width: 769px) {
+            .desktop-sidebar { display: flex; flex-direction: column; }
+            .mobile-nav { display: none; }
+            .main-content { margin-left: 280px; padding-bottom: 0; width: calc(100% - 280px); }
+            .figure-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+        }
 
         @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .mobile-nav { display: flex; justify-content: space-around; align-items: center; }
-            .main-content { padding-bottom: 90px !important; }
-            .catalog-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 1rem !important; }
-            .series-pill { font-size: 1.2rem !important; padding: 8px 24px !important; }
-            header { display: none !important; }
+            .figure-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+            .series-pill { font-size: 1.25rem !important; padding: 10px 30px !important; }
+            .nav-btn { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #7a6e1d; }
         }
 
-        /* Found Figure Glow/Silhouette logic */
-        .figure-img { transition: all 0.4s ease; filter: grayscale(100%) brightness(0.4) opacity(0.6) contrast(1.7); }
-        .figure-img-found { filter: grayscale(0%) opacity(1) contrast(1) !important; transform: scale(1.05); }
-        .theme-glow .figure-img-found { filter: drop-shadow(var(--glow-effect)) brightness(1.3) !important; }
+        /* Image Filters */
+        .figure-img { transition: 0.3s; filter: grayscale(100%) brightness(0.4) opacity(0.5) contrast(1.6); }
+        .figure-img-found { filter: grayscale(0%) opacity(1) !important; }
+        .theme-glow .figure-img-found { filter: drop-shadow(var(--glow-effect)) brightness(1.2) !important; }
 
-        .series-pill { background-color: var(--header-yellow); color: var(--text-muted); padding: 12px 48px; border-radius: 999px; font-weight: 900; font-size: 2rem; display: inline-block; border: 2px solid var(--accent-green); }
-        .figure-card { background-color: var(--card-bg); border: 1px solid var(--border-color); transition: all 0.3s ease; border-radius: 1.25rem; position: relative; }
-        .name-label { background-color: var(--header-yellow); color: var(--text-muted); padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 0.6rem; display: inline-block; width: 100%; text-align: center; border: 1px solid var(--accent-green); overflow: hidden; }
-        .counter-badge { position: absolute; top: 8px; left: 8px; background: var(--bg-primary); border: 1px solid var(--accent-green); border-radius: 20px; padding: 2px 10px; font-size: 12px; font-weight: 900; z-index: 10; display: flex; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .figure-card { background: var(--bg-primary); border: 1px solid #eee; border-radius: 1rem; position: relative; padding: 1rem; text-align: center; }
+        .series-pill { background: var(--header-yellow); color: #7a6e1d; padding: 12px 40px; border-radius: 999px; font-weight: 900; font-size: 2rem; border: 2px solid var(--accent-green); display: inline-block; }
+        .counter { position: absolute; top: 5px; left: 5px; background: white; border: 1px solid #ddd; border-radius: 15px; padding: 2px 10px; font-size: 12px; font-weight: 900; color: black; display: flex; gap: 10px; z-index: 50; }
     </style>
 </head>
 <body :class="settings.siteTheme === 'glow' ? 'theme-glow' : ''">
-    <div id="app" class="flex min-h-screen">
-        <aside class="sidebar">
+    <div id="app">
+        <aside class="desktop-sidebar">
             <div class="p-8 bg-[#F6E957] text-center border-b-2 border-[#89b86b]">
                 <div class="text-2xl font-black text-[#89b86b]">スミスキ━</div>
-                <div class="text-[10px] font-black uppercase tracking-widest mt-1">Status: {{ syncStatus }}</div>
             </div>
             <nav class="flex-grow overflow-y-auto p-4 space-y-1">
-                <a v-for="series in collection" :href="'#' + series.name" class="flex justify-between p-3 text-[10px] font-bold text-gray-400 uppercase hover:bg-black/5 rounded-lg transition-all">
-                    <span>{{ series.name }}</span><span>{{ getSeriesOwned(series) }}</span>
+                <a v-for="s in collection" :href="'#'+s.name" class="flex justify-between p-3 text-[10px] font-bold text-gray-400 uppercase hover:bg-black/5 rounded-lg">
+                    <span>{{ s.name }}</span><span>{{ getSeriesOwned(s) }}</span>
                 </a>
             </nav>
         </aside>
 
-        <nav class="mobile-nav px-4">
-            <button @click="viewMode = 'all'" class="flex flex-col items-center">
-                <span class="text-[10px] font-black uppercase" :style="viewMode === 'all' ? 'color:black' : 'opacity:0.5'">Catalog</span>
-            </button>
-            <button @click="viewMode = 'found'" class="flex flex-col items-center">
-                <span class="text-[10px] font-black uppercase" :style="viewMode === 'found' ? 'color:black' : 'opacity:0.5'">My Found</span>
-            </button>
-            <button @click="toggleTheme" class="flex flex-col items-center">
-                <span class="text-[10px] font-black uppercase">Theme</span>
-            </button>
+        <nav class="mobile-nav">
+            <button @click="viewMode = 'all'" class="nav-btn">Catalog</button>
+            <button @click="viewMode = 'found'" class="nav-btn">Found</button>
+            <button @click="toggleTheme" class="nav-btn">Glow</button>
         </nav>
 
-        <main class="flex-grow main-content overflow-y-auto">
-            <header class="bg-[#F6E957] px-12 py-8 flex justify-end gap-10 text-[11px] font-black uppercase tracking-widest text-[#7a6e1d]">
+        <main class="main-content">
+            <header class="hidden md:flex bg-[#F6E957] p-8 justify-end gap-10 font-black uppercase text-xs text-[#7a6e1d]">
                 <button @click="viewMode = 'all'">Catalog</button>
                 <button @click="viewMode = 'found'">Found</button>
-                <button @click="toggleTheme">Glow Toggle</button>
+                <button @click="toggleTheme">Toggle Glow</button>
             </header>
 
-            <div class="p-6 md:p-20 space-y-20 md:space-y-40">
+            <div class="p-4 md:p-20">
                 <div v-if="viewMode === 'found'">
-                    <h2 class="series-pill uppercase mb-10">Collection Gallery</h2>
-                    <div class="grid catalog-grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                        <div v-for="item in foundList" class="figure-card p-4 flex flex-col items-center">
-                            <div class="counter-badge"><span>QTY: {{ item.count }}</span></div>
-                            <img :src="'./' + item.fileName" class="figure-img-found w-full mb-4">
-                            <div class="name-label">{{ item.name }}</div>
+                    <h2 class="series-pill mb-10">My Army</h2>
+                    <div class="grid figure-grid gap-4">
+                        <div v-for="item in foundList" class="figure-card">
+                            <div class="counter">QTY: {{ item.count }}</div>
+                            <img :src="'./' + item.fileName" class="figure-img-found w-full">
+                            <div class="text-[10px] font-bold mt-2 uppercase">{{ item.name }}</div>
                         </div>
                     </div>
                 </div>
 
-                <div v-else v-for="series in collection" :id="series.name" class="text-center scroll-mt-32">
-                    <h2 class="series-pill uppercase mb-10 md:mb-20">{{ series.name }}</h2>
-                    <div class="grid catalog-grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-6 md:gap-8">
-                        <div v-for="item in series.items" class="figure-card p-4 flex flex-col items-center">
-                            <div class="counter-badge">
+                <div v-else v-for="series in collection" :id="series.name" class="mb-20 text-center">
+                    <h2 class="series-pill mb-10">{{ series.name }}</h2>
+                    <div class="grid figure-grid gap-4">
+                        <div v-for="item in series.items" class="figure-card">
+                            <div class="counter">
                                 <button @click.stop="updateCount(item, -1)">-</button>
                                 <span>{{ item.count }}</span>
                                 <button @click.stop="updateCount(item, 1)">+</button>
                             </div>
-                            <img :src="'./' + item.fileName" :class="['figure-img mb-4 h-24 md:h-32 object-contain', {'figure-img-found': item.count > 0}]">
-                            <div class="name-label uppercase truncate">{{ item.name }}</div>
+                            <img :src="'./' + item.fileName" :class="['figure-img w-full', {'figure-img-found': item.count > 0}]">
+                            <div class="text-[10px] font-bold mt-2 uppercase">{{ item.name }}</div>
                         </div>
                     </div>
-                </section>
+                </div>
             </div>
         </main>
     </div>
@@ -129,9 +123,9 @@
         createApp({
             data() {
                 return {
-                    viewMode: 'all', syncStatus: '...', settings: { siteTheme: 'official' },
+                    viewMode: 'all', settings: { siteTheme: 'official' },
                     collection: [
-                        { name: 'Series 1', items: [{name:'Hugging Knees', fileName:'s1_01.png'},{name:'Sitting', fileName:'s1_02.png'},{name:'Looking Back', fileName:'s1_03.png'},{name:'Lounging', fileName:'s1_04.png'},{name:'Hiding', fileName:'s1_05.png'},{name:'Peeking', fileName:'s1_06.png'},{name:'The Scream', fileName:'secret.jpg'}] },
+                        { name: 'Series 1', items: [{name:'Hugging Knees', fileName:'s1_01.png'},{name:'Sitting', fileName:'s1_02.png'},{name:'Looking Back', fileName:'s1_03.png'},{name:'Lounging', fileName:'s1_04.png'},{name:'Hiding', fileName:'s1_05.png'},{name:'Peeking', fileName:'s1_06.png'},{name:'Secret Scream', fileName:'secret.jpg'}] },
                         { name: 'Series 2', items: [{name:'Kneeling', fileName:'s2_01.png'},{name:'Peeking', fileName:'s2_02.png'},{name:'Climbing', fileName:'s2_03.png'},{name:'Resting', fileName:'s2_04.png'},{name:'Looking Up', fileName:'s2_05.png'},{name:'Pushing', fileName:'s2_06.png'},{name:'Birth of Venus', fileName:'secret.jpg'}] },
                         { name: 'Series 3', items: [{name:'Bridge', fileName:'3_3 (1).png'},{name:'Peeking', fileName:'3_4 (1).png'},{name:'Climbing', fileName:'3_5 (1).png'},{name:'Little', fileName:'3_6 (1).png'},{name:'Hiding', fileName:'3_7 (1).png'},{name:'Handstand', fileName:'3_8 (1).png'},{name:'Thinker', fileName:'secret.jpg'}] },
                         { name: 'Series 4', items: [{name:'Crawl', fileName:'01.png'},{name:'Hold Up', fileName:'02.png'},{name:'Squatting', fileName:'03.png'},{name:'Flute', fileName:'04.png'},{name:'With Cat', fileName:'05.png'},{name:'Peeking', fileName:'06.png'},{name:'Twin Angels', fileName:'secret.jpg'}] },
@@ -148,9 +142,7 @@
             },
             computed: {
                 foundList() { return this.collection.flatMap(s => s.items).filter(i => i.count > 0); },
-                totalOwned() { return this.foundList.length; },
-                totalPossible() { return this.collection.flatMap(s => s.items).length; },
-                totalMastery() { return Math.round((this.totalOwned / this.totalPossible) * 100); }
+                getSeriesOwned: () => (s) => s.items.filter(i => i.count > 0).length
             },
             methods: {
                 toggleTheme() { this.settings.siteTheme = this.settings.siteTheme === 'glow' ? 'official' : 'glow'; this.pushData(); },
@@ -166,18 +158,14 @@
                                 if (item) item.count = parseInt(row.count);
                             }
                         });
-                        this.syncStatus = 'Live';
-                    } catch (e) { this.syncStatus = 'Off'; }
+                    } catch (e) { console.error("Cloud Error", e); }
                 },
                 async pushData() {
-                    this.syncStatus = '...';
                     const payload = this.collection.flatMap(s => s.items.map(i => ({series: s.name, name: i.name, count: i.count})));
                     payload.push({series: 'SYSTEM', name: 'Theme', count: this.settings.siteTheme});
                     await fetch(CLOUD_URL, { method: 'POST', body: JSON.stringify(payload), mode: 'no-cors' });
-                    this.syncStatus = 'Live';
                 },
-                updateCount(item, v) { item.count = Math.max(0, item.count + v); this.pushData(); },
-                getSeriesOwned(s) { return s.items.filter(i => i.count > 0).length; }
+                updateCount(item, v) { item.count = Math.max(0, item.count + v); this.pushData(); }
             },
             mounted() { this.pullData(); }
         }).mount('#app')
